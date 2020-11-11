@@ -1,3 +1,3 @@
-### Boilerplate  REST API with user management using Node JS and MongoDB
+### Boilerplate  REST API with user management using NodeJS and MongoDB
 ----
 
