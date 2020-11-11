@@ -6,7 +6,6 @@ var logger = require('morgan');
 var compression = require('compression');
 var helmet = require('helmet')
 var useragent = require('express-useragent');
-
 var winston = require('winston');
 const { createLogger, format, transports } = require('winston');
 
@@ -21,9 +20,20 @@ logger1 = winston.createLogger({
 logger1.info("server.started");
 
 var usersRouter = require('./user/routes');
+var adminRouter = require('./admin/router')
+
 var apiMiddle = require('./services/middlewares');
+var dbLog = require("./admin/serverLogs")
+// dbLog.newDBLog({server:true,message:"server.started"}) //TODO uncomment
 
 var app = express();
+
+// app.use(async function(req,res,next){
+//     let data = await dbLog.logModel.find({})
+//     console.log(data)
+//     next()
+// })
+
 app.use(useragent.express());
 app.use(logger('dev'));
 app.use(compression()); 
@@ -47,6 +57,7 @@ app.get('/', function (req, res, next) {
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
 app.use('/users', usersRouter);
+app.use('/admin',adminRouter);
 
 app.use(function (req, res, next) {
     var err = new Error('notfound::Route not found');
