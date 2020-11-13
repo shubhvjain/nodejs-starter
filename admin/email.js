@@ -1,11 +1,10 @@
 var nodemailer = require('nodemailer');
 var ejs = require('ejs');
 
-
 var configs = require('./config');
 var util = require('../services/utils')
 let dbConfig = require('./serverSettings')
-
+let dbLog = require('./serverLogs')
 //  https://stackoverflow.com/a/17606289
 String.prototype.replaceAll = function (search, replacement) {
     var target = this;
@@ -28,14 +27,14 @@ String.prototype.replaceAll = function (search, replacement) {
 
 // https://nodemailer.com/smtp/well-known/
 let transporter1 = nodemailer.createTransport({
-    service: process.env.EMAIL_SERVICE, 
+    service: process.env.EMAIL_SERVICE,
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PWD
     },
 });
 
-let sendEmail = async (reciever, data) => {
+let sendEmail = async (uname, reciever, data) => {
     try {
         var mailOptions = {
             from: process.env.EMAIL_USER,
@@ -45,12 +44,24 @@ let sendEmail = async (reciever, data) => {
             html: data.body
         };
         await transporter1.sendMail(mailOptions)
-        // TODO log email 
-        //await util.newLog({ server: true, message: 'email.sent', data: mailOptions })
+        // throw util.genError("sample","testing")
+        await dbLog.newDBLog({
+            username: uname,
+            message: "email.sent",
+            type: "user",
+            data: mailOptions,
+            display: false
+        })
         return { message: "Mail sent" }
     } catch (error) {
         console.log(error)
-        //await util.newLog({ server: true, message: 'error.sendEmail', data: { error: error, reciever: reciever, data: data } })
+        await dbLog.newDBLog({
+            username: uname,
+            message: "email.sentError",
+            type: "user",
+            data: { error: error.messsage, mailOptions: mailOptions },
+            display: false
+        })
         throw util.genError('sendEmailError', error.messsage);
     }
 }
@@ -92,11 +103,11 @@ module.exports.composeEmail = composeEmail;
 
 //compose email using the provided template id and data and send the email
 // mostly , this function will be used at other pages
-let composeSendEmail = async (reciever, templateId, data) => {
+let composeSendEmail = async (uname, reciever, templateId, data) => {
     try {
         //reciever - email id  
         let emailData = await composeEmail(templateId, data);
-        let msg = await sendEmail(reciever, emailData)
+        let msg = await sendEmail(uname, reciever, emailData)
         return msg
     } catch (error) {
         throw error
@@ -104,11 +115,9 @@ let composeSendEmail = async (reciever, templateId, data) => {
 }
 module.exports.composeSendEmail = composeSendEmail;
 
-// // running funcions here 
 // composeEmail('customEmail', { name: "Shubh"}).then((result) => {
 //     console.log(result);
 // }).catch((er) => {
 //     console.log(er)
 // })
-
-// composeSendEmail('shubhbpl@gmail.com', 'customEmail', { name: "Shubh..." }).then(msg => { console.log(msg) }).catch(err => { console.log(err) })
+// composeSendEmail('vardhan', 'shubhbpl@gmail.com', 'customEmail', { name: "Shubh..." }).then(msg => { console.log(msg) }).catch(err => { console.log(err) })

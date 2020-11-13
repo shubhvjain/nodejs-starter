@@ -57,10 +57,11 @@ let newDBLog = async (data) => {
             }
         }
         let sl = new logModel(obj)
+        console.log(sl)
         await sl.save();
         return { message: "Logged" }
     } catch (error) {
-        return error
+        throw  error
     }
 }
 module.exports.newDBLog = newDBLog;
