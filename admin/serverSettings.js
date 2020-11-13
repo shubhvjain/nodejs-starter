@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');
 var utils = require('../services/utils');
 // let User = require("../user/model");
-// let configs = require('../services/config');
+let configs = require('./config');
 
 mongoose.connect(process.env.DB_URL, {
 	useNewUrlParser: true,
@@ -62,7 +62,7 @@ function objectNotExists(jsonData) {
         Mdl.findOne(jsonData)
             .then(function (record) {
                 if (record) {
-                    reject(cfn.genError('recordExists', 'Record already exists'));
+                    reject(utils.genError('recordExists', 'Record already exists'));
                 } else {
                     resolve();
                 }
@@ -81,11 +81,10 @@ let searchSetting = (jsonData, fieldsToFetch) => {
             // define defaultNoField in the config file
             a = configs.getInner('settingsModel', 'defaultNoField')
         }
-        console.log(b)
         Mdl.find(b, a.join(' '))
             .then(function (record) {
                 if (!record || Object.keys(record).length <= 0) {
-                    reject(cfn.genError('notFound', 'No record found'));
+                    reject(utils.genError('notFound', 'No record found'));
                 } else {
                     resolve(record);
                 }
@@ -109,13 +108,13 @@ let settingExists = async (criteria, resolveExists) => {
                     if (resolveExists) {
                         resolve(user);
                     } else {
-                        reject(cfn.genError('duplicate', 'settings exists'));
+                        reject(utils.genError('duplicate', 'settings exists'));
                     }
                 } else {
                     if (resolveExists == false) {
                         resolve()
                     } else {
-                        reject(cfn.genError('notFound', 'Setting not found'))
+                        reject(utils.genError('notFound', 'Setting not found'))
 
                     }
                 }
@@ -130,7 +129,7 @@ let settingExists = async (criteria, resolveExists) => {
 let updateSetting = async (username, link, updates) => {
     try {
         let updObj = updates
-        await cfn.inspectJSON(updates, {
+        utils.inspectJSON(updates, {
             validFields: ['data', 'about', 'pwd','updPwdRequired']
         })
 
@@ -139,11 +138,11 @@ let updateSetting = async (username, link, updates) => {
         }, true);
 
         if (settingObject.updPwdRequired=="yes") {
-            await cfn.inspectJSON(updates, {
+            utils.inspectJSON(updates, {
                 validFields:['data', 'about', 'pwd','updPwdRequired'],
                 requiredFields: ['pwd']
-            })
-            await User.comparePassword(username, updates['pwd']);
+            })    
+            // await User.comparePassword(username, updates['pwd']); // TODO uncomment
             delete updObj['pwd']
         }
 
@@ -164,11 +163,11 @@ let deleteSetting = async (user, link) => {
             link: link
         })
         if (user1['deletionAllowed'] == "yes") {
-            logit.info(user + " deleted setting " + link + ", data dump =" + JSON.stringify(user1));
+            // logit.info(user + " deleted setting " + link + ", data dump =" + JSON.stringify(user1));
             await Mdl.findByIdAndRemove(user1._id)
             return { message: 'Setting deleted' }
         } else {
-            throw cfn.genError('notAllowed', 'This setting cannot be deleted')
+            throw utils.genError('notAllowed', 'This setting cannot be deleted')
         }
     } catch (error) {
         throw error

@@ -16,62 +16,6 @@ let configs = {
         loginTknLong: "1080", // 45*24 , 45 days token 
         tokenHeaderName: "user-access-token",
     },
-    mailTemplates: [
-        {
-            name: "verifyWithPin",
-            type: 'html',
-            subject: "Verify PIN",
-            // body: "Dear %name% , your 6 digit PIN to %task% is -  %pin% .",
-            body: "<div class=\"email\" style=\"font-family: 'Courier', sans-serif; display: block;  padding: 20% 20%; background: #fff; box-shadow: 0 0 15px 0 #999; border-radius: 10px; font-size: 18px;  line-height: 1.6;\"> <p>Dear, %name% </p><p>Your 6 digit pin to %task% is</p> <p style=\"text-align:center;font-size:40px;\"> %pin% </p> <p>Do not share this pin with anyone</p><p>Note that this token is valid only for a certian period of time. </p><p>Thanks</p><p>Support - shubhvjain@gmail.com</p></div>",
-            replacement: ["%name%", "%pin%", "%task%"]
-        },
-        {
-            name: "activateAccount",
-            type: 'html',
-            subject: "Verify PIN",
-            // body: "Dear %name% , your 6 digit PIN to activate account is -  %pin% .",
-            body: "<div class=\"email\" style=\"font-family: 'Courier', sans-serif; display: block;  padding: 20% 20%; background: #fff; box-shadow: 0 0 15px 0 #999; border-radius: 10px; font-size: 18px;  line-height: 1.6;\"> <p>Dear, %name% </p><p>Your 6 digit pin to activate your account is </p> <p style=\"text-align:center;font-size:40px;\"> %pin% </p> <p>Do not share this pin with anyone</p><p>Note that this pin is valid only for a certian period of time. </p><p>Thanks</p><p>Support - shubhvjain@gmail.com</p></div>",
-            replacement: ["%name%", "%pin%"]
-        },
-        {
-            name: "resetWithPin",
-            type: 'html',
-            subject: "Reset password",
-            body: "<div class=\"email\" style=\"font-family: 'Courier', sans-serif; display: block;  padding: 10% 10%; background: #fff; box-shadow: 0 0 15px 0 #999; border-radius: 10px; font-size: 18px;  line-height: 1.6;\"> <p>Dear, %name% </p><p>Your 6 digit pin to reset your password is</p> <p style=\"text-align:center;font-size:40px;\"> %pin% </p> <p>Do not share this pin with anyone</p><p>Note that this pin is valid only for a certian period of time. </p><p>Thanks</p><p>Support - shubhvjain@gmail.com</p></div>",
-            // body: "Dear %name% ,your 6 digit PIN to reset your password is -  %pin% .",
-            replacement: ["%name%", "%pin%"]
-        },
-        {
-            name: "accountActivated",
-            type: 'html',
-            subject: "Account activated",
-            body: "<div class='email' style=\"font-family: 'Courier', sans-serif; display: block;  padding: 20% 20%; background: #fff; box-shadow: 0 0 15px 0 #999; border-radius: 10px; font-size: 18px;  line-height: 1.6;\">  <p>Dear, %name% </p> <p>Your account is now active. Your username is  </p> <p style='text-align:center;font-size:40px;'> %username% </p> <p>Use this username and your password to login</p> <p>Do not share your password with anyone. </p>  <p>Thanks</p>  <p>Support - shubhvjain@gmail.com</p> </div> ",
-            // body: "Dear %name% ,your email is verified. Your username is  -  %username% .",
-            replacement: ["%name%", "%username%"]
-        },
-        {
-            name: "pwdChanged",
-            type: 'html',
-            subject: "Password Changed",
-            //body: "Dear %name%  , your password was changed on %currentTime% .<br> (Note - Just testing an app. You can simply igonore this mail.)",
-            body: "<div class='email' style=\"font-family: 'Courier', sans-serif; display: block;  padding: 10% 10%; background: #fff; box-shadow: 0 0 15px 0 #999; border-radius: 10px; font-size: 18px;  line-height: 1.6;\">  <p>Dear, %name% </p> <p>Your password was changed on <b> %currentTime%  </b> </p> <p>Reset your password immediately if it wasn't you and contact support </p> <p>Thanks</p>  <p>Support - shubhvjain@gmail.com</p> </div>",
-            replacement: ["%name%", "%currentTime%"]
-        },
-        {
-            name: 'dailyBackup',
-            type: 'html',
-            subject: "Daily backup done",
-            body: "<div class='email' style=\"font-family: 'Courier', sans-serif; display: block;  padding: 10% 10%; background: #fff; box-shadow: 0 0 15px 0 #999; border-radius: 10px; font-size: 18px;  line-height: 1.6;\">  <p>Hi</p> <p>Daily database backup done successfully</p><p>Details</p>%details%<p>Thanks</p> </div> ",
-            replacement: ["%details%"]
-        },
-        , {
-            name: "reviewPage",
-            type: "html",
-            subject: "Pages to review today",
-            body: "<div class='email' style=\"font-family: 'Courier', sans-serif; display: block;  padding: 8% 8%; background: #fff; box-shadow: 0 0 15px 0 #999; border-radius: 10px; font-size: 16px;  line-height: 1.6;\"><p>Hi,</p><p>Here is a list of notebook pages you need to review today</p>%pageList%<p>To review these pages , login to your account and click on 'Review pages' on the home page</p> <p>Thanks</p></div>",
-            replacement: ['%pageList%']
-        }
-    ],
     authModel1: [
         {
             name: "user",
