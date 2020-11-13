@@ -9,8 +9,8 @@ let newConfig = async () => {
             link: 'emailData',
             sType: 'config',
             data: {
-                "headerTemplate": " this is the header... this can also be in ejs",
-                "footerTemplate": " this is the footer in ejs. signature <%-signature%>  <br> Support email : <%-supportEmail%>",
+                "headerTemplate": "<div class='email' style=\"font-family: 'Courier', sans-serif; display: block;  padding: 10% 10%; background: #fff; box-shadow: 0 0 15px 0 #999; border-radius: 10px; font-size: 18px;  line-height: 1.6;\"> ",
+                "footerTemplate": "<br> <p>Thanks, <%-signature%></p><br><p>Support email - <%-supportEmail%></p></div>",
                 "defaultData": {
                     "supportEmail": "sampleemail.com",
                     "signature": "shubh",
@@ -34,6 +34,21 @@ let newConfig = async () => {
             deletionAllowed: "no",
             updPwdRequired: "no",
             about: 'Email template for testing',
+            username: 'initByServer'
+        },
+        {
+            link: 'pwdChanged',
+            sType: 'template',
+            data: {
+                type: 'ejs',
+                subject: "Password Changed",
+                body: "<p>Dear, <%-name%> </p> <p>Your password was changed on <b> <-%currentTime%>  </b> </p> <p>Reset your password immediately if it wasn't you and contact support </p> ",
+                addHeader: true,
+                addFooter: true
+            },
+            deletionAllowed: "no",
+            updPwdRequired: "no",
+            about: 'Email template to alert when the user updates password ',
             username: 'initByServer'
         },
     ]

@@ -3,6 +3,14 @@
 //          they must be array of json. 
 //          each json must have a unique 'name' field
 let configs = {
+    user: {
+        defaultRole: "member",
+        role:["developer", "admin", "manager", "staff", "member", "guest"],
+        defaultNoField: ['timezone', 'username', 'name', 'email', 'address', 'mobileNo', 'createdOn', 'role'],
+        validSearchFields: ['role', 'username', 'email', 'password', 'mobileNo', 'name', 'address'],
+        validFetchFields: ['username', 'role', 'address', 'email', 'mobileNo', 'name', 'createdOn', 'emailTokenType'],
+    },
+    
     setupDevelopment: {
 
     },
@@ -82,13 +90,7 @@ let configs = {
     authHierarchy: { "developer": 1, "admin": 2, "manager": 3, "staff": 4, "member": 5, "guest": 6, "newUser": 7 },
     validPinTypes: ['verifyWithPin', 'resetWithPin', 'activateAccount'],
     userRoles: ["developer", "admin", "manager", "staff", "member", "guest"],
-    user: {
-        defaultRole: "member",
-        // for userSearch() function in user model
-        validSearchFields: ['role', 'username', 'email', 'password', 'mobileNo', 'name', 'address'],
-        validFetchFields: ['username', 'role', 'address', 'email', 'mobileNo', 'name', 'createdOn', 'emailTokenType'],
-        defaultNoField: ['timezone', 'username', 'name', 'email', 'address', 'mobileNo', 'createdOn', 'role']
-    },
+    
     note: {
         defaultNoField: ['title', 'description', 'createdOn', 'username', 'pages', 'link', 'tags']
 
