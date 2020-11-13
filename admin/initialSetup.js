@@ -9,14 +9,31 @@ let newConfig = async () => {
             link: 'emailData',
             sType: 'config',
             data: {
-                "supportEmail":"",
-                "signature":"",
-                "beginTemplate":"",
-                "endTemplate":""
+                "headerTemplate": " this is the header... this can also be in ejs",
+                "footerTemplate": " this is the footer in ejs. signature <%-signature%>  <br> Support email : <%-supportEmail%>",
+                "defaultData": {
+                    "supportEmail": "sampleemail.com",
+                    "signature": "shubh",
+                }
             },
             deletionAllowed: "no",
             updPwdRequired: "no",
             about: 'Configs related to email',
+            username: 'initByServer'
+        },
+        {
+            link: 'customEmail',
+            sType: 'template',
+            data: {
+                type: 'ejs',
+                subject: "Hello, <%-name%>",
+                body: "This is a sample email. This is some variable :  <%let currentTime= new Date();%>  <%-currentTime%>",
+                addHeader: true,
+                addFooter: true
+            },
+            deletionAllowed: "no",
+            updPwdRequired: "no",
+            about: 'Email template for testing',
             username: 'initByServer'
         },
     ]

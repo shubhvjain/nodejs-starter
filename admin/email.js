@@ -1,6 +1,10 @@
 var nodemailer = require('nodemailer');
+var ejs = require('ejs');
+
+
 var configs = require('./config');
-var util = require('./utilities')
+var util = require('../services/utils')
+let dbConfig = require('./serverSettings')
 
 //  https://stackoverflow.com/a/17606289
 String.prototype.replaceAll = function (search, replacement) {
@@ -8,127 +12,103 @@ String.prototype.replaceAll = function (search, replacement) {
     return target.replace(new RegExp(search, 'g'), replacement);
 };
 
-// const transporter = nodemailer.createTransport({
-//     service: 'gmail',
+// const transporter1 = nodemailer.createTransport({
+//     host: process.env.EMAIL_HOST,
+//     port: process.env.EMAIL_PORT,
+//     secure: false,
 //     auth: {
-//         type: process.env.EMAIL_TYPE,
 //         user: process.env.EMAIL_USER,
-//         clientId: process.env.EMAIL_CLIENTID,
-//         clientSecret: process.env.EMAIL_CLIENTSECRET,
-//         refreshToken: process.env.EMAIL_REFRESHTOKEN,
-//         accessToken: process.env.EMAILACCESSTOKEN
+//         pass: process.env.EMAIL_PWD
+//     },
+//     tls: {
+//         rejectUnauthorized: false,
+//        //  secureProtocol: "TLSv1_method",
 //     }
 // });
 
-
-const transporter1 = nodemailer.createTransport({
-    host: process.env.EHOST,
-    port: process.env.EPORT,
-    secure: false, // use TLS
+// https://nodemailer.com/smtp/well-known/
+let transporter1 = nodemailer.createTransport({
+    service: process.env.EMAIL_SERVICE, 
     auth: {
-        user: process.env.EUSER,
-        pass: process.env.EPASS
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PWD
     },
-    tls: {
-        rejectUnauthorized: false,
-        secureProtocol: "TLSv1_method",
-    }
 });
 
-
-//core function that actually sends email
-let sendEmail = (reciever, data) => {
-    return new Promise(async function (resolve, reject) {
-        try {
-            var mailOptions = {
-                from: process.env.EUSER,
-                to: reciever,
-                subject: data.subject,
-                text: " ",
-                html: data.body
-            };
-
-            await transporter1.sendMail(mailOptions)
-            //await util.newLog({ server: true, message: 'email.sent', data: mailOptions })
-            if (logit) {
-                logit.info("email sent to ' " + reciever + "' subject is '" + data.subject + "'");
-            } else {
-                console.log("email sent to ' " + reciever + "' subject is '" + data.subject + "'");
-            }
-            resolve({ message: "Mail sent" });
-        } catch (error) {
-            console.log(error)
-            //await util.newLog({ server: true, message: 'error.sendEmail', data: { error: error, reciever: reciever, data: data } })
-            reject(util.genError('sendEmailError', error.messsage));
-        }
-    });
+let sendEmail = async (reciever, data) => {
+    try {
+        var mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: reciever,
+            subject: data.subject,
+            text: " ",
+            html: data.body
+        };
+        await transporter1.sendMail(mailOptions)
+        // TODO log email 
+        //await util.newLog({ server: true, message: 'email.sent', data: mailOptions })
+        return { message: "Mail sent" }
+    } catch (error) {
+        console.log(error)
+        //await util.newLog({ server: true, message: 'error.sendEmail', data: { error: error, reciever: reciever, data: data } })
+        throw util.genError('sendEmailError', error.messsage);
+    }
 }
 module.exports.sendEmail = sendEmail;
 
-let dbConfig = require('../settings/model')
 // just composes email , given the template id and data
 let composeEmail = async (templateID, data) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            // step 1 - get the template
-            // let templData = configs.getInner('mailTemplates', templateID)[0];
-            let a = await dbConfig.settingExists({ link: templateID }, true)
-            let templData = a['data'];
-            //   console.log(templData)
+    try {
+        // get the template
+        let rec1 = await dbConfig.settingExists({ link: templateID }, true)
+        // get email config setting doc
+        let rec2 = await dbConfig.settingExists({ link: "emailData" }, true)
 
-            if (templData) {
-                // handling html type template
-                if (templData.type == 'html') {
-                    let bdy = templData.body;
-                    // step 2 -  add data inside the Template body
-                    templData.replacement.map((key) => {
-                        let res = key.slice(1, key.length - 1)
-                        bdy = bdy.replaceAll(key, data[res]);
-                    });
-                    resolve({ subject: templData.subject, body: bdy });
-                } else {
-                    throw util.genError('internalError', 'Invalid mail template type ' + templData.type + ' for template ' + templData.name, 'email.composeEmail')
-                }
-            } else {
-                throw util.genError("internalError", "Mail template not found. Mail not send")
+        let defData = rec2["data"];
+        let templData = rec1['data'];
+        // combine default data and input data 
+        let combData = Object.assign(defData["defaultData"], data)
+        if (templData) {
+            if (templData.type == 'ejs') {
+                let sub = ejs.render(templData.subject, combData)
+                let body = `${templData.addHeader ? defData.headerTemplate : ""}
+                            ${templData.body} 
+                            ${templData.addFooter ? defData.footerTemplate : ""}`
+                let bodyhtml = ejs.render(body, combData)
+                return { subject: sub, body: bodyhtml }
             }
-        } catch (error) {
-            await util.newLog({ server: true, message: 'error.composeEmail', data: { error: error, templateID: templateID, data: data } })
-            reject(error)
-
+            else {
+                throw util.genError('internalError', 'Invalid mail template type ' + templData.type + ' for template ' + templData.name, 'email.composeEmail')
+            }
+        } else {
+            throw util.genError("internalError", "Mail template not found. Mail not send")
         }
-    });
+    } catch (error) {
+        //  await util.newLog({ server: true, message: 'error.composeEmail', data: { error: error, templateID: templateID, data: data } })
+        throw error
+    }
 }
 module.exports.composeEmail = composeEmail;
 
 //compose email using the provided template id and data and send the email
 // mostly , this function will be used at other pages
-let composeSendEmail = (reciever, templateId, data) => {
-    //reciever - email id
-    return new Promise((resolve, reject) => {
-        composeEmail(templateId, data)
-            .then((emailData) => {
-                return sendEmail(reciever, emailData)
-            })
-            .then((msg) => {
-                resolve(msg);
-            })
-            .catch((err) => {
-                reject(err)
-            })
-    })
+let composeSendEmail = async (reciever, templateId, data) => {
+    try {
+        //reciever - email id  
+        let emailData = await composeEmail(templateId, data);
+        let msg = await sendEmail(reciever, emailData)
+        return msg
+    } catch (error) {
+        throw error
+    }
 }
 module.exports.composeSendEmail = composeSendEmail;
 
-// running funcions here 
-// composeEmail('verifyWithPin', { name: "Some name", pin: 12344, email: "shubhbpl@gmail.com" ,task:'login'}).then((result) => {
+// // running funcions here 
+// composeEmail('customEmail', { name: "Shubh"}).then((result) => {
 //     console.log(result);
 // }).catch((er) => {
 //     console.log(er)
 // })
-// wont work if email.js is run individually, requires env variable
-// sendEmail('shubhbpl@gmail.com', { header: 'Hi there', body: 'Just testing whether email service is working or not', name: "Some name", pin: 12344, email: "shubhbpl@gmail.com", task: 'login' }).then((result) => {
-//     console.log(result);
-// }).catch((er) => {
-//     console.log(er)
-// })
+
+// composeSendEmail('shubhbpl@gmail.com', 'customEmail', { name: "Shubh..." }).then(msg => { console.log(msg) }).catch(err => { console.log(err) })

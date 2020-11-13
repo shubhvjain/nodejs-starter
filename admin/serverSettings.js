@@ -98,12 +98,12 @@ let searchSetting = (jsonData, fieldsToFetch) => {
 let settingExists = async (criteria, resolveExists) => {
     return new Promise(function (resolve, reject) {
         // to search for active, not deleted user only, add status 1 to all request
-        console.log(criteria)
+        //console.log(criteria)
         Mdl.findOne(criteria)
             .then(function (user) {
                 //console.log("---\n"+JSON.stringify(criteria)+"\n ----")
                 //       console.log("----\n"+JSON.stringify(user)+"\n--")
-                console.log(user)
+                //console.log(user)
                 if (user) {
                     if (resolveExists) {
                         resolve(user);
