@@ -8,9 +8,9 @@ To connect to MongoDB server
 - `DB_NAME` : Name of database to use in MongoDB
 
 To send emails
-- `ADMIN_EMAIL` : 
-- `EMAIL_HOST` :  
-- `EMAIL_PORT` :  
-- `EMAIL_USER` : 
-- `EMAIL_PWD` :   
-- `EMAIL_SERVICE` :
+- `ADMIN_EMAIL` : Provide email of admin to send server emails like backup etc..
+- `EMAIL_HOST` :  Host of email provider
+- `EMAIL_PORT` :  Port of email provider
+- `EMAIL_USER` :  Username of email provider
+- `EMAIL_PWD` :   Email password
+- `EMAIL_SERVICE` : Email service (must be a well known [Nodemailer service](https://nodemailer.com/smtp/well-known/))
