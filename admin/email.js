@@ -1,15 +1,10 @@
 var nodemailer = require('nodemailer');
 var ejs = require('ejs');
 
-var configs = require('./config');
 var util = require('../services/utils')
 let dbConfig = require('./serverSettings')
 let dbLog = require('./serverLogs')
-//  https://stackoverflow.com/a/17606289
-String.prototype.replaceAll = function (search, replacement) {
-    var target = this;
-    return target.replace(new RegExp(search, 'g'), replacement);
-};
+
 
 // const transporter1 = nodemailer.createTransport({
 //     host: process.env.EMAIL_HOST,
@@ -95,7 +90,6 @@ let composeEmail = async (templateID, data) => {
             throw util.genError("internalError", "Mail template not found. Mail not send")
         }
     } catch (error) {
-        //  await util.newLog({ server: true, message: 'error.composeEmail', data: { error: error, templateID: templateID, data: data } })
         throw error
     }
 }
