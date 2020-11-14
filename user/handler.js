@@ -2,6 +2,7 @@ var UserModel = require('../user/model')
 var pinService = require('../admin/emailPin.js');
 let util = require('../services/utils')
 let cf = require('../admin/config');
+let dbLog = require('../admin/serverLogs')
 var momentTimezone = require("moment-timezone")
 
 let index = (req, res, next) => { res.success({ msg: "User API" }) }
@@ -60,6 +61,61 @@ let resendVerfiy = async (req, res) => {
 }
 module.exports.resendVerfiy = resendVerfiy;
 
+// to send password reset pin to email
+let sendPasswordLink = async (req, res) => {
+  try {
+    var jsonD = req.body;
+    await util.inspectJSON(jsonD, {
+      requiredFields: ["username"],
+      validFields: ["username"]
+    })
+    let data = await UserModel.userExists({ username: jsonD.username })
+    await pinService.generateAndSendPin(data.username, { templateId: "resetWithPin" })
+    await dbLog.newDBLog({ 
+      username: data.username, 
+      type: 'user', 
+      message: 'user.forgetPasswordRequest', 
+      data: {}, 
+      display: true 
+    })
+    res.success({ message: 'Password reset pin sent to email' })
+  } catch (error) {
+    res.error(error);
+  }
+}
+module.exports.sendPasswordLink = sendPasswordLink;
+
+// to reset password
+let resetPassword = async (req, res) => {
+  try {
+    var jsonD = req.body;
+    await util.inspectJSON(jsonD, {
+      requiredFields: ["pin", "username", "password"],
+      validFields: ['pin', 'username', "password"]
+    })
+    await pinService.verifyPin(jsonD.username, jsonD.pin, "resetWithPin");
+    await UserModel.update(jsonD.username, { password: jsonD.password })
+    await pinService.resolvePin(jsonD.username, jsonD.pin, "resetWithPin")
+
+    await dbLog.newDBLog({ 
+      username: jsonD.username, 
+      type: 'user', 
+      message: 'user.passwordResetSuccess', 
+      data: {}, 
+      display: true 
+    })
+
+    res.success({ message: "Password Reset." })
+  } catch (error) {
+    res.error(error);
+
+  }
+}
+module.exports.resetPassword = resetPassword;
+
+
+
+
 // to get data of the user
 let getUserData = async (req, res, next) => {
   try {
@@ -100,41 +156,6 @@ let deleteUser = async (req, res, next) => {
   }
 }
 module.exports.deleteUser = deleteUser;
-
-// to send password reset pin to email
-let sendPasswordLink = async (req, res) => {
-  try {
-    var jsonD = req.body;
-    let data = await UserModel.userExists({ username: jsonD.username })
-    await util.newLog({ username: data.username, type: 'user', message: 'user.forgetPasswordRequest', data: {}, display: true })
-    await pinService.generateAndSendPin(data.username, { templateId: "resetWithPin" })
-    res.success({ message: 'Password reset pin sent to email' })
-  } catch (error) {
-    res.error(error);
-  }
-}
-module.exports.sendPasswordLink = sendPasswordLink;
-
-// to reset password
-let resetPassword = async (req, res) => {
-  try {
-    var jsonD = req.body;
-    await util.inspectJSON(jsonD, {
-      requiredFields: ["pin", "username", "password"],
-      validFields: ['pin', 'username', "password"]
-    })
-    await pinService.verifyPin(jsonD.username, jsonD.pin, "resetWithPin");
-    await UserModel.userUpdate(jsonD.username, { password: jsonD.password })
-    await pinService.resolvePin(jsonD.username, jsonD.pin, "resetWithPin")
-    await util.newLog({ username: jsonD.username, type: 'user', message: 'user.passwordResetSuccess', data: {}, display: true })
-
-    res.success({ message: "Password Reset." })
-  } catch (error) {
-    res.error(error);
-
-  }
-}
-module.exports.resetPassword = resetPassword;
 
 let searchUser = async (req, res) => {
   try {

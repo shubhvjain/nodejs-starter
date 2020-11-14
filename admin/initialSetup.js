@@ -42,7 +42,7 @@ let newConfig = async () => {
             data: {
                 type: 'ejs',
                 subject: "Password Changed",
-                body: "<p>Dear, <%-name%> </p> <p>Your password was changed on <b> <-%currentTime%>  </b> </p> <p>Reset your password immediately if it wasn't you and contact support </p> ",
+                body: "<p>Dear, <%-name%> </p> <p>Your password was changed on <b> <%-currentTime%>  </b> </p> <p>Reset your password immediately if it wasn't you and contact support </p> ",
                 addHeader: true,
                 addFooter: true
             },
@@ -79,6 +79,21 @@ let newConfig = async () => {
             deletionAllowed: "no",
             updPwdRequired: "no",
             about: 'Email template for email sent after account is created successfully',
+            username: 'initByServer'
+        },
+        {
+            link: 'resetWithPin',
+            sType: 'template',
+            data: {
+                type: 'ejs',
+                addHeader: true,
+                addFooter: true,
+                subject: "Reset password",
+                body: "<p>Dear, <%-name%> </p><p>Your 6 digit pin to reset your password is</p> <p style=\"text-align:center;font-size:40px;\"> <%-pin%> </p> <p>Do not share this pin with anyone</p><p>Note that this pin is valid only for a certian period of time. </p>",
+            },
+            deletionAllowed: "no",
+            updPwdRequired: "no",
+            about: 'Email template to Reset password',
             username: 'initByServer'
         },
     ]
