@@ -24,11 +24,12 @@ module.exports.signUp = signUp;
 // this is a common function to verify all types of pin
 let verifyMail = async (req, res, next) => {
   try {
-    util.inspectJSON(req.body,{
-      requiredFields:["username","pin","pinType"],
-      validFields:["username","pin","pinType"],
-      acceptBlank:false})
-      
+    util.inspectJSON(req.body, {
+      requiredFields: ["username", "pin", "pinType"],
+      validFields: ["username", "pin", "pinType"],
+      acceptBlank: false
+    })
+
     var jsonD = req.body;
     await util.inspectJSON(jsonD, {
       requiredFields: ["pin", "pinType", "username"],
@@ -51,7 +52,6 @@ let resendVerfiy = async (req, res) => {
       requiredFields: ["pinType", "username"],
       validFields: ['pinType', 'username']
     })
-    await util.newLog({ username: jsonD.username, type: 'user', message: 'user.resendVerfiyPin', data: {}, display: true })
     await pinService.generateAndSendPin(jsonD.username, { templateId: jsonD.pinType, task: 'authenticate' })
     res.success({ message: "PIN sent to email" })
   } catch (err) {
