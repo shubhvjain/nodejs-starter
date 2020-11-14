@@ -10,6 +10,7 @@ let configs = {
         validSearchFields: ['role', 'username', 'email', 'password', 'mobileNo', 'name', 'address'],
         validFetchFields: ['username', 'role', 'address', 'email', 'mobileNo', 'name', 'createdOn', 'emailTokenType'],
     },
+    validPinTypes: ['verifyWithPin', 'resetWithPin', 'activateAccount'],
     
     setupDevelopment: {
 
@@ -88,7 +89,6 @@ let configs = {
             }
         }],
     authHierarchy: { "developer": 1, "admin": 2, "manager": 3, "staff": 4, "member": 5, "guest": 6, "newUser": 7 },
-    validPinTypes: ['verifyWithPin', 'resetWithPin', 'activateAccount'],
     userRoles: ["developer", "admin", "manager", "staff", "member", "guest"],
     
     note: {

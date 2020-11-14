@@ -3,12 +3,10 @@ var bcrypt = require('bcryptjs');
 var momentTimezone = require("moment-timezone")
 var passwordValidator = require('password-validator');
 
-let configs = require('../services/config');
+let configs = require('../admin/config');
 var cfn = require('../services/utils');
 var emailServices = require('../admin/email')
 var dbLog = require('../admin/serverLogs')
-
-let utils = require('../services/utilities')
 
 // mongo init
 mongoose.Promise = require('bluebird');
@@ -165,7 +163,7 @@ UserSchema.pre('save', function (next) {
 });
 
 var User = mongoose.model('users1', UserSchema);
-module.exports = User;
+module.exports.UserSchema = User;
 
 let insert = async (jsonData) => {
     try {

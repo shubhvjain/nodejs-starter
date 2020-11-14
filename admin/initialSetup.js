@@ -51,6 +51,36 @@ let newConfig = async () => {
             about: 'Email template to alert when the user updates password ',
             username: 'initByServer'
         },
+        {
+            link: 'activateAccount',
+            sType: 'template',
+            data: {
+                type: 'ejs',
+                addHeader: true,
+                addFooter: true,
+                subject: "Verify PIN",
+                body: "<p>Dear, <%-name%> </p><p>Your 6 digit pin to activate your account is </p> <p style=\"text-align:center;font-size:40px;\"> <%-pin%> </p> <p>Do not share this pin with anyone</p><p>Note that this pin is valid only for a certian period of time.</p>",
+            },
+            deletionAllowed: "no",
+            updPwdRequired: "no",
+            about: 'Email template to Verify pin to activate account',
+            username: 'initByServer'
+        },
+        {
+            link: 'accountActivated',
+            sType: 'template',
+            data: {
+                type: 'ejs',
+                addHeader: true,
+                addFooter: true,
+                subject: "Account activated",
+                body: " <p>Dear, <%-name%> </p> <p>Your account is now active. Your username is  </p> <p style='text-align:center;font-size:40px;'> <%-username%> </p> <p>Use this username and your password to login</p> <p>Do not share your password with anyone. </p>",
+            },
+            deletionAllowed: "no",
+            updPwdRequired: "no",
+            about: 'Email template for email sent after account is created successfully',
+            username: 'initByServer'
+        },
     ]
 
     for (let index = 0; index < defaultConfigs.length; index++) {
