@@ -5,33 +5,34 @@ const cnf = require("../admin/config");
 var userheadername = cnf.getInner('auth', 'tokenHeaderName');
 
 // common validation function, validates incoming 'token'
-let validateUser = async (token) => {
-    try {
-        if (token) {
-            let secCode = cnf.getInner('auth', 'loginSecretCode')
-            jwt.verify(token, secCode, async function (err, decoded) {
-                if (err) {
-                    throw uti.genError('unauthorized', "Failed to authenticate token.Login again", '')
-                } else {
-                    try {
-                        let udata = await User.userExists({ username: decoded.data.username });
-                        var d1 = new Date(decoded.iat * 1000);  // https://stackoverflow.com/a/847196
-                        var d2 = new Date(udata.pwdchange);
-                        //console.log(udata);
-                        if (d1 <= d2) {
-                            throw uti.genError('unauthorized', "Password changed. Login again ", '')
-                        } else {
-                            decoded.data['role'] = udata.role;
-                            decoded.data['timezone'] = udata.timezone
-                            return decoded.data;
-                        }
-                    } catch (error) { throw error }
-                }
-            });
-        } else {
-            throw uti.genError('unauthorized', "No token provided", '')
-        }
-    } catch (error) { throw error }
+let validateUser = (token) => {
+        return new Promise((resolve,reject)=>{
+            if (token) {
+                let secCode = cnf.getInner('auth', 'loginSecretCode')
+                jwt.verify(token, secCode, async function (err, decoded) {
+                    if (err) {
+                        reject(uti.genError('unauthorized', "Failed to authenticate token.Login again", ''))
+                    } else {
+                        try {
+                            let udata = await User.userExists({ username: decoded.data.username });
+                            var d1 = new Date(decoded.iat * 1000);  // https://stackoverflow.com/a/847196
+                            var d2 = new Date(udata.pwdchange);
+                            //console.log(udata);
+                            if (d1 <= d2) {
+                                reject(uti.genError('unauthorized', "Password changed. Login again ", ''))
+                            } else {
+                                decoded.data['role'] = udata.role;
+                                decoded.data['timezone'] = udata.timezone
+                                resolve(decoded.data);
+                            }
+                        } catch (error) { reject(error) }
+                    }
+                });
+            } else {
+                reject(uti.genError('unauthorized', "No token provided", ''))
+            }
+        })
+        
 }
 module.exports.validateUser = validateUser;
 
