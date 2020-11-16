@@ -116,7 +116,6 @@ let resetPassword = async (req, res) => {
 module.exports.resetPassword = resetPassword;
 
 // user login 
-
 let login = async (req, res, next) => {
   try {
 
@@ -166,14 +165,10 @@ module.exports.login = login;
 // to get data of the user
 let getUserData = async (req, res, next) => {
   try {
-    let data = await UserModel.userSearch({
-      username: req.params.uname
-    })
+    let data = await UserModel.search({username: req.params.uname,status:1})
     let tz = momentTimezone.tz.names()
     res.success({ user: data[0], static: { timezones: tz } });
-  } catch (error) {
-    res.error(error);
-  }
+  } catch (error) {res.error(error);}
 }
 module.exports.getUserData = getUserData;
 

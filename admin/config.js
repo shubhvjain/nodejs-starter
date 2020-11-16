@@ -6,7 +6,7 @@ let configs = {
     user: {
         defaultRole: "member",
         role:["developer", "admin", "manager", "staff", "member", "guest"],
-        defaultNoField: ['timezone', 'username', 'name', 'email', 'address', 'mobileNo', 'createdOn', 'role'],
+        defaultNoField: ['timezone', 'username', 'name', 'email', 'address', 'mobileNo', 'createdOn', 'role','pwdchange'],
         validSearchFields: ['role', 'username', 'email', 'password', 'mobileNo', 'name', 'address'],
         validFetchFields: ['username', 'role', 'address', 'email', 'mobileNo', 'name', 'createdOn', 'emailTokenType'],
     },

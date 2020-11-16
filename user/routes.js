@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
 var handler = require('./handler');
+var auth = require('../services/authentication');
+
 
 router.route('/')
     .get(handler.index)
@@ -17,24 +19,12 @@ router.route('/password')
 router.route('/login')
   .post(handler.login);
 
-module.exports = router;
-
-
-
-// var userCtrl = require("./controller");
-// var auth = require('../services/authenticate');
-
-// router.route('/verifytoken')
-//   .post(userCtrl.verifyToken)
-
-
-
 // //authenticate all the routes mentioned below
 // router.use(auth.needAuthentication);
 
 // // For - /api/user/u/:uname - To view,edit,delete user
-// router.route('/u/:uname')
-//   .get(auth.privateForUser, userCtrl.getUserData)
+router.route('/u/:uname')
+    .get(auth.privateForUser, handler.getUserData)
 //   .put(auth.privateForUser,userCtrl.getUserActivity)
 //   .post(userCtrl.setUserData)
 //   .delete(userCtrl.deleteUser);
@@ -45,4 +35,4 @@ module.exports = router;
 // router.route('/search')
 //   .post(userCtrl.searchUser);
 
-// module.exports = router;
+module.exports = router;
