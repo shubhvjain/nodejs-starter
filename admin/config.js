@@ -11,7 +11,12 @@ let configs = {
         validFetchFields: ['username', 'role', 'address', 'email', 'mobileNo', 'name', 'createdOn', 'emailTokenType'],
     },
     validPinTypes: ['verifyWithPin', 'resetWithPin', 'activateAccount'],
-    
+    auth: {
+        loginTknValidity: "24",// =  7 * 24 , token valid for next 7 days
+        loginSecretCode: "SuperSecretTextMessage#1.2.3.4",
+        loginTknLong: "1440", // 60*24 , 60 days validity 
+        tokenHeaderName: "user-access-token",
+    },
     setupDevelopment: {
 
     },
@@ -19,12 +24,7 @@ let configs = {
 
     },
     adminUsername: 'vardhan',
-    auth: {
-        loginTknValidity: "24",// =  7 * 24 , token valid for next 7 days
-        loginSecretCode: "SuperSecretTextMessage#1.2.3.4",
-        loginTknLong: "1080", // 45*24 , 45 days token 
-        tokenHeaderName: "user-access-token",
-    },
+   
     authModel1: [
         {
             name: "user",

@@ -1,9 +1,11 @@
+var momentTimezone = require("moment-timezone")
+const jwt = require('jsonwebtoken');
+
 var UserModel = require('../user/model')
 var pinService = require('../admin/emailPin.js');
 let util = require('../services/utils')
 let cf = require('../admin/config');
 let dbLog = require('../admin/serverLogs')
-var momentTimezone = require("moment-timezone")
 
 let index = (req, res, next) => { res.success({ msg: "User API" }) }
 module.exports.index = index
@@ -71,12 +73,12 @@ let sendPasswordLink = async (req, res) => {
     })
     let data = await UserModel.userExists({ username: jsonD.username })
     await pinService.generateAndSendPin(data.username, { templateId: "resetWithPin" })
-    await dbLog.newDBLog({ 
-      username: data.username, 
-      type: 'user', 
-      message: 'user.forgetPasswordRequest', 
-      data: {}, 
-      display: true 
+    await dbLog.newDBLog({
+      username: data.username,
+      type: 'user',
+      message: 'user.forgetPasswordRequest',
+      data: {},
+      display: true
     })
     res.success({ message: 'Password reset pin sent to email' })
   } catch (error) {
@@ -97,12 +99,12 @@ let resetPassword = async (req, res) => {
     await UserModel.update(jsonD.username, { password: jsonD.password })
     await pinService.resolvePin(jsonD.username, jsonD.pin, "resetWithPin")
 
-    await dbLog.newDBLog({ 
-      username: jsonD.username, 
-      type: 'user', 
-      message: 'user.passwordResetSuccess', 
-      data: {}, 
-      display: true 
+    await dbLog.newDBLog({
+      username: jsonD.username,
+      type: 'user',
+      message: 'user.passwordResetSuccess',
+      data: {},
+      display: true
     })
 
     res.success({ message: "Password Reset." })
@@ -113,8 +115,53 @@ let resetPassword = async (req, res) => {
 }
 module.exports.resetPassword = resetPassword;
 
+// user login 
 
+let login = async (req, res, next) => {
+  try {
 
+    let jsonD  = req.body; 
+
+    util.inspectJSON(req.body, {
+      requiredFields: ["username", "password"],
+      validFields: ["username", "password","remember"]
+    })
+
+    let user = await UserModel.comparePassword(jsonD.username, jsonD.password)
+    let udata = { username: user.username }
+
+    var userheadername = cf.getInner('auth', 'tokenHeaderName');
+    let secCode = cf.getInner('auth', 'loginSecretCode')
+    let tknValid = cf.getInner('auth', 'loginTknValidity')
+    if (req.body.remember) {tknValid = cnf.getInner('auth', 'loginTknLong')}
+
+    let token = jwt.sign({
+      exp: Math.floor(Date.now() / 1000) + (tknValid * 3600),
+      data: udata,
+    }, secCode);
+
+    res.cookie(userheadername, token, {
+      maxAge: 8.64e+7,
+      httpOnly: true,
+      secure: false  //TODO change to true
+    });
+
+    await dbLog.newDBLog({
+      username: jsonD.username,
+      type: 'user',
+      message: "user.login",
+      data: { useragent: req.useragent },
+      display: true
+    })
+
+    res.success({ token: token, message: "Logged in. Use token with further requests" });
+
+  } catch (error) {
+    res.clearCookie(userheadername);
+    res.error(error)
+  }
+}
+module.exports.login = login;
 
 // to get data of the user
 let getUserData = async (req, res, next) => {

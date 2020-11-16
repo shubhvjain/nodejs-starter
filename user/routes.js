@@ -14,6 +14,8 @@ router.route('/password')
     .post(handler.sendPasswordLink)
     .put(handler.resetPassword)    
 
+router.route('/login')
+  .post(handler.login);
 
 module.exports = router;
 
@@ -24,9 +26,6 @@ module.exports = router;
 
 // router.route('/verifytoken')
 //   .post(userCtrl.verifyToken)
-
-// router.route('/login')
-//   .post(auth.login);
 
 
 
